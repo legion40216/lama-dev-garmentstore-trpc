@@ -18,8 +18,10 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { formatter } from "@/utils/formatters";
 
-interface ProductCardProps
-  extends Pick<ProductType, "id" | "name" | "description" | "images" | "sizes"> {}
+type ProductCardProps = Pick<
+  ProductType,
+  "id" | "name" | "description" | "images" | "sizes"
+>;
 
 export default function ProductCard({
   id,
@@ -103,7 +105,6 @@ export default function ProductCard({
   const hasDiscount = getDiscount() > 0;
   const isStandalone = sizes.length === 1 && sizes[0].size === "One Size";
 
-  // Check if this specific combination is in cart
   const itemCountInCart = getItemCount(
     id.toString(),
     selectedSize,
@@ -134,7 +135,6 @@ export default function ProductCard({
 
       {/* Sizes + Colors */}
       <div className="flex flex-wrap gap-4 items-center">
-        {/* Select Size - Hide if standalone product */}
         {!isStandalone && (
           <Select value={selectedSize} onValueChange={handleSizeChange}>
             <SelectTrigger className="w-[120px]">
@@ -151,7 +151,6 @@ export default function ProductCard({
           </Select>
         )}
 
-        {/* Select Color - Show available colors for current size */}
         <RadioGroup
           value={colorsBySize[selectedSize] || ""}
           onValueChange={handleColorChange}
@@ -165,9 +164,7 @@ export default function ProductCard({
               className="size-6 rounded-full border-2 border-gray-300
                          data-[state=checked]:border-black disabled:opacity-50"
               style={{ backgroundColor: variant.colorCode }}
-              title={`${variant.color} ${
-                variant.stock === 0 ? "(Out of Stock)" : ""
-              }`}
+              title={`${variant.color} ${variant.stock === 0 ? "(Out of Stock)" : ""}`}
               disabled={variant.stock === 0}
             />
           ))}
