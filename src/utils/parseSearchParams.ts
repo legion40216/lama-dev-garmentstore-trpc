@@ -30,18 +30,14 @@ function normalizeClientSearchParams(
 // 3. Main Parser
 export function getValidatedSearchParams(
   input:
-    | Record<string, string | string[] | undefined> // Server
-    | URLSearchParams // Client
-    | ReadonlyURLSearchParams // Client
+    | Record<string, string | string[] | undefined>
+    | URLSearchParams
+    | ReadonlyURLSearchParams
 ): SearchParamsValues {
-  
-  // Convert input to a standard object { key: "value" }
   const normalized =
-    input && typeof (input as any).entries === "function"
-      ? normalizeClientSearchParams(input as URLSearchParams)
-      : normalizeServerSearchParams(input as Record<string, any>);
+    "entries" in input && typeof input.entries === "function"
+      ? normalizeClientSearchParams(input)
+      : normalizeServerSearchParams(input);
 
-  // Zod does the magic here.
-  // If normalized.category is "red", Zod returns the default category.
   return searchParamsSchema.parse(normalized);
 }
