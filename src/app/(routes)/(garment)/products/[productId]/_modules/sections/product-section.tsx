@@ -9,13 +9,19 @@ interface ProductSectionProps {
   productId: string;
 }
 
+type Product = (typeof products)[number];
+
 export default function ProductSection({ productId }: ProductSectionProps) {
   const product = products.find(p => p.id.toString() === productId);
-  
+
   if (!product) {
     return <div>Product not found</div>;
   }
 
+  return <ProductSectionContent key={product.id} product={product} />;
+}
+
+function ProductSectionContent({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState<string>(
     product.sizes[0]?.size || ""
   );
@@ -30,51 +36,50 @@ export default function ProductSection({ productId }: ProductSectionProps) {
 
   const [mainImage, setMainImage] = useState<string>(product.images[0]);
 
-  // Get current size object
   const getCurrentSizeObj = () => {
     return product.sizes.find(s => s.size === selectedSize) || product.sizes[0];
   };
 
-  // Get active variant based on selected size and color
   const getActiveVariant = () => {
     const sizeObj = getCurrentSizeObj();
     const currentColor = colorsBySize[selectedSize];
     return sizeObj?.variants.find(v => v.color === currentColor) || sizeObj?.variants[0];
   };
 
-  // Update main image when variant changes
   React.useEffect(() => {
-    const activeVariant = getActiveVariant();
+    const sizeObj =
+      product.sizes.find(s => s.size === selectedSize) || product.sizes[0];
+    const currentColor = colorsBySize[selectedSize];
+    const activeVariant =
+      sizeObj?.variants.find(v => v.color === currentColor) || sizeObj?.variants[0];
+
     if (activeVariant?.image) {
       setMainImage(activeVariant.image);
     } else if (product.images[0]) {
       setMainImage(product.images[0]);
     }
-  }, [selectedSize, colorsBySize]);
+  }, [product, selectedSize, colorsBySize]);
 
   const activeVariant = getActiveVariant();
-  
-  // Create image gallery from product images
+
   const imageGallery = React.useMemo(() => {
     const images: string[] = [];
-    
-    // Add general product images
+
     product.images.forEach(img => {
       if (!images.includes(img)) {
         images.push(img);
       }
     });
-    
+
     return images;
-  }, [product.images]);
+  }, [product]);
 
   const handleThumbnailClick = (image: string) => {
     setMainImage(image);
-    
-    // Find which color this image belongs to for the current size
+
     const sizeObj = getCurrentSizeObj();
     const variant = sizeObj?.variants.find(v => v.image === image);
-    
+
     if (variant) {
       setColorsBySize(prev => ({
         ...prev,
@@ -83,7 +88,6 @@ export default function ProductSection({ productId }: ProductSectionProps) {
     }
   };
 
-  // Get all available sizes from product
   const availableSizes = product.sizes.map(s => s.size);
 
   return (
