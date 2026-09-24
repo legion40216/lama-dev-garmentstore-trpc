@@ -1,4 +1,9 @@
-type NavLink = {\n  label: string;\n  href: string;\n};\n\nexport const navLinks: NavLink[] = [];
+type NavLink = {
+  label: string;
+  href: string;
+};
+
+export const navLinks: NavLink[] = [];
 
 export const footerLinks = [
   {
