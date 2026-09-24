@@ -27,17 +27,24 @@ function normalizeClientSearchParams(
   return result;
 }
 
+type SearchParamsInput =
+  | Record<string, string | string[] | undefined>
+  | URLSearchParams
+  | ReadonlyURLSearchParams;
+
+function isClientSearchParams(
+  input: SearchParamsInput
+): input is URLSearchParams | ReadonlyURLSearchParams {
+  return "entries" in input && typeof input.entries === "function";
+}
+
 // 3. Main Parser
 export function getValidatedSearchParams(
-  input:
-    | Record<string, string | string[] | undefined>
-    | URLSearchParams
-    | ReadonlyURLSearchParams
+  input: SearchParamsInput
 ): SearchParamsValues {
-  const normalized =
-    "entries" in input && typeof input.entries === "function"
-      ? normalizeClientSearchParams(input)
-      : normalizeServerSearchParams(input);
+  const normalized = isClientSearchParams(input)
+    ? normalizeClientSearchParams(input)
+    : normalizeServerSearchParams(input);
 
   return searchParamsSchema.parse(normalized);
 }
